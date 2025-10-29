@@ -1,0 +1,11 @@
+import numpy as np
+from mcts import MCTS
+from c4 import C4
+from game_runner_cpu import GameRunner
+from kalah import Kalah
+ 
+if __name__=="__main__":
+    AI = MCTS(search_time_limit=1.0, search_steps_limit=np.inf, vanilla=True)
+    #game_runner = GameRunner(C4,None,AI,0,1,None)
+    game_runner = GameRunner(Kalah,None,AI,0,1,None)
+    outcome,game_info = game_runner.run()
