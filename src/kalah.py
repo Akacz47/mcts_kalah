@@ -18,8 +18,9 @@ class Kalah(State):
         super().__init__(parent)
         if self.parent:
             self.k = np.copy(self.parent.k)
-            self.magazyn1 = np.copy(self.parent.magazyn1)
-            self.magazyn2 = np.copy(self.parent.magazyn2)
+            self.magazyn = np.copy(self.parent.magazyn)
+            # self.magazyn1 = np.copy(self.parent.magazyn1)
+            # self.magazyn2 = np.copy(self.parent.magazyn2)
             self.board = np.copy(self.parent.board)
             self.bonus = np.copy(self.parent.bonus)
             self.steal = np.copy(self.parent.steal)
@@ -31,8 +32,9 @@ class Kalah(State):
             # self.steal = self.parent.steal
         else:
             self.k = Kalah.KAMIENIE
-            self.magazyn1 = 0
-            self.magazyn2 = 0
+            self.magazyn = np.zeros(2,dtype=np.int8)
+            # self.magazyn1 = int8(0)
+            # self.magazyn2 = int8(0)
             self.board = np.array([[self.k for i in range(Kalah.POLE)],[self.k for i in range(Kalah.POLE)]], dtype=np.int8)
             self.bonus = False
             self.steal = False
@@ -46,7 +48,7 @@ class Kalah(State):
         s = ''
         for i in range(2):
             if i == 1:
-                s += str(self.magazyn2) # magazyn
+                s += str(self.magazyn[1]) # magazyn
             else:
                 s += ' '
 
@@ -62,7 +64,7 @@ class Kalah(State):
             s += '   '
 
             if i == 1:
-                s += str(self.magazyn1) # magazyn
+                s += str(self.magazyn[0]) # magazyn
             else:
                 s += ' '
 
@@ -83,6 +85,8 @@ class Kalah(State):
             return Kalah.PLAYER1_ROW
         return Kalah.PLAYER2_ROW
     
+
+    
     def take_action_job(self, action_index):
         # Pojedynczy ruch
         # Ruch pusty jako 0 potem zrobić albo ruch pusty jako 6
@@ -90,6 +94,7 @@ class Kalah(State):
         player_row = self.get_player_row()
         current_row = self.get_player_row()
         stones = self.board[player_row, action_index]
+
         if stones == 0 or action_index > 5 or action_index < 0:
             return False
         if stones == 1:
@@ -99,11 +104,12 @@ class Kalah(State):
                 enemy_row = 1
             enemy_stones = self.board[enemy_row, action_index]
             self.board[enemy_row, action_index] = 0
-            if player_row == 1:
-                self.magazyn2 += enemy_stones
-            else:
-                self.magazyn1 += enemy_stones
-            
+            self.magazyn[player_row] += enemy_stones
+            # if player_row == 1:
+            #     self.magazyn[1] += enemy_stones
+            # else:
+            #     self.magazyn[0] += enemy_stones
+
         self.board[player_row, action_index] = 0
 
         counter = int8(np.copy(self.turn))
@@ -115,7 +121,7 @@ class Kalah(State):
                 counter = 0
                 current_row = 0
                 if player_row == 1:
-                    self.magazyn1 += 1
+                    self.magazyn[0] += 1
                     stones -= 1
                     continue
             elif idx < 0:
@@ -124,7 +130,7 @@ class Kalah(State):
                 counter = 0
                 current_row = 1
                 if player_row == 0:
-                    self.magazyn2 += 1
+                    self.magazyn[1] += 1
                     stones -= 1
                     continue
             #print(idx)
@@ -152,51 +158,51 @@ class Kalah(State):
         """  
         NUMBA = True
         if NUMBA: #faster
-            numba_outcome = Kalah.compute_outcome_job_numba_jit(self.board,self.magazyn1,self.magazyn2)
+            numba_outcome = Kalah.compute_outcome_job_numba_jit(self.board,self.magazyn)
             if numba_outcome!=-2:
                 return numba_outcome
         else: # pure Python
             if np.sum(self.board[1,:])==0:
-                self.magazyn2 += np.sum(self.board[0,:])
+                self.magazyn[1] += np.sum(self.board[0,:])
                 self.board[0,:] = np.zeros_like(self.board[0,:])
-                if self.magazyn1>self.magazyn2:
+                if self.magazyn[0]>self.magazyn[1]:
                     return 1
-                elif self.magazyn2>self.magazyn1:
+                elif self.magazyn[1]>self.magazyn[0]:
                     return -1
                 elif self.magazyn2 == self.magazyn1:
                     return 0
             elif np.sum(self.board[0,:])==0:
-                self.magazyn1 += np.sum(self.board[1,:])
+                self.magazyn[0] += np.sum(self.board[1,:])
                 self.board[1,:] = np.zeros_like(self.board[1,:])
-                if self.magazyn1>self.magazyn2:
+                if self.magazyn[0]>self.magazyn[1]:
                     return 1
-                elif self.magazyn2>self.magazyn1:
+                elif self.magazyn[1]>self.magazyn[0]:
                     return -1
                 elif self.magazyn2 == self.magazyn1:
                     return 0
         return None    
    
     @staticmethod
-    @jit(int8(int8[:,:], int8, int8), nopython=True, cache=True)  
-    def compute_outcome_job_numba_jit(board,magazyn1,magazyn2):
+    @jit(int8(int8[:,:], int8[:]), nopython=True, cache=True)  
+    def compute_outcome_job_numba_jit(board,magazyn):
         """Called by ``compute_outcome_job`` for faster outcomes."""  
         if np.sum(board[1,:])==0:
-            magazyn2 += np.sum(board[0,:])
+            magazyn[1] += np.sum(board[0,:])
             board[0,:] = np.zeros_like(board[0,:])
-            if magazyn1>magazyn2:
+            if magazyn[0]>magazyn[1]:
                 return 1
-            elif magazyn2>magazyn1:
+            elif magazyn[1]>magazyn[0]:
                 return -1
-            elif magazyn2 == magazyn1:
+            else: # magazyn[0] == magazyn[1]
                 return 0
         elif np.sum(board[0,:])==0:
-            magazyn1 += np.sum(board[1,:])
+            magazyn[0] += np.sum(board[1,:])
             board[1,:] = np.zeros_like(board[1,:])
-            if magazyn1>magazyn2:
+            if magazyn[0]>magazyn[1]:
                 return 1
-            elif magazyn2>magazyn1:
+            elif magazyn[1]>magazyn[0]:
                 return -1
-            elif magazyn2 == magazyn1:
+            else: # magazyn[0] == magazyn[1]
                 return 0
         return -2 #zamiast None
                         
