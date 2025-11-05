@@ -86,10 +86,11 @@ class Kalah(State):
     def take_action_job(self, action_index):
         # Pojedynczy ruch
         # Ruch pusty jako 0 potem zrobić albo ruch pusty jako 6
+        # bonus zrobic
         player_row = self.get_player_row()
         current_row = self.get_player_row()
         stones = self.board[player_row, action_index]
-        if stones == 0:
+        if stones == 0 or action_index > 5 or action_index < 0:
             return False
         if stones == 1:
             if player_row == 1:
