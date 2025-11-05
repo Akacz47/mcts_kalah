@@ -50,7 +50,8 @@ class Kalah(State):
             if i == 1:
                 s += str(self.magazyn[0]) # magazyn
             else:
-                s += ' '
+                if self.magazyn[0] < 10:
+                    s += ' '
 
             s += '   '
 
@@ -69,13 +70,6 @@ class Kalah(State):
                 s += ' '
 
             s += '\n'
-        
-        # Do wyrównania planszy, gdy liczby są > 9
-        # for i in range(1,3):
-        #     for j in range(Kalah.POLE):
-        #         if self.board[i,j > 9]:
-        #             if i == 1:
-        #                 self.board[0, j]
 
         return s
     
@@ -98,15 +92,6 @@ class Kalah(State):
         if stones == 0 or action_index > 5 or action_index < 0:
             return False
 
-        # if stones == 1:
-        #     if player_row == 1:
-        #         enemy_row = 0
-        #     else:
-        #         enemy_row = 1
-        #     enemy_stones = self.board[enemy_row, action_index]
-        #     self.board[enemy_row, action_index] = 0
-        #     self.magazyn[player_row] += enemy_stones
-
         self.board[player_row, action_index] = 0
 
         counter = int8(np.copy(self.turn))
@@ -117,16 +102,19 @@ class Kalah(State):
                 action_index = Kalah.POLE-1
                 counter = 0
                 current_row = 0
-                self.magazyn[player_row] += 1
-                stones -= 1
+                if player_row == 1:
+                    self.magazyn[player_row] += 1
+                    stones -= 1
                 continue      
             elif idx < 0:
                 idx = 0
                 action_index = 0
                 counter = 0
                 current_row = 1
-                self.magazyn[player_row] += 1
-                stones -= 1
+                if player_row == 0:
+                    self.magazyn[player_row] += 1
+                    stones -= 1
+                continue
             #print(idx)
             #idx = np.clip(idx,0,Kalah.POLE-1)
 
