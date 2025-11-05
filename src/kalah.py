@@ -40,7 +40,8 @@ class Kalah(State):
             if i == 1:
                 s += str(self.magazyn[0]) # magazyn
             else:
-                s += ' '
+                if self.magazyn[0] < 10:
+                    s += ' '
 
             s += '   '
 
@@ -49,7 +50,6 @@ class Kalah(State):
                 s += str(self.board[i,j]) # kamienie w wierszach
                 if self.board[i,j] < 10:
                     s += ' '
-
 
             s += '|'
             s += '   '
@@ -60,7 +60,7 @@ class Kalah(State):
                 s += ' '
 
             s += '\n'
-        
+
         return s
     
     def get_player_row(self):
@@ -74,22 +74,13 @@ class Kalah(State):
     def take_action_job(self, action_index):
         # Pojedynczy ruch
         # Ruch pusty jako 0 potem zrobić albo ruch pusty jako 6
+        # bonus zrobic
         player_row = self.get_player_row()
         current_row = self.get_player_row()
         stones = self.board[player_row, action_index]
 
-        if stones == 0:
+        if stones == 0 or action_index > 5 or action_index < 0:
             return False
-        if action_index>5 or action_index<0:
-            return False
-        # if stones == 1:
-        #     if player_row == 1:
-        #         enemy_row = 0
-        #     else:
-        #         enemy_row = 1
-        #     enemy_stones = self.board[enemy_row, action_index]
-        #     self.board[enemy_row, action_index] = 0
-        #     self.magazyn[player_row] += enemy_stones
 
         self.board[player_row, action_index] = 0
 
@@ -101,21 +92,30 @@ class Kalah(State):
                 action_index = Kalah.POLE-1
                 counter = 0
                 current_row = 0
-                if player_row==1:
+                if player_row == 1:
                     self.magazyn[player_row] += 1
                     stones -= 1
-                continue
+                continue      
             elif idx < 0:
                 idx = 0
                 action_index = 0
                 counter = 0
                 current_row = 1
-                if player_row==0:
+                if player_row == 0:
                     self.magazyn[player_row] += 1
                     stones -= 1
                 continue
             #print(idx)
             #idx = np.clip(idx,0,Kalah.POLE-1)
+
+            # Predict if we can steal
+            if self.board[current_row, idx] == 0 and player_row == current_row and stones == 1:
+                if player_row == 1:
+                    enemy_row = 0
+                else:
+                    enemy_row = 1
+                self.magazyn[player_row] += self.board[enemy_row, idx]
+                self.board[enemy_row, idx] = 0
             self.board[current_row, idx] += 1
             if current_row == 1:
                 counter += 1
