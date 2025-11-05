@@ -17,22 +17,22 @@ class Kalah(State):
     def __init__(self, parent=None):
         super().__init__(parent)
         if self.parent:
-            # self.k = np.copy(self.parent.k)
-            # self.magazyn1 = np.copy(self.parent.magazyn1)
-            # self.magazyn2 = np.copy(self.parent.magazyn2)
-            # self.board = np.copy(self.parent.board)
-            # self.bonus = np.copy(self.parent.bonus)
-            # self.steal = np.copy(self.parent.steal)
-            self.k = self.parent.k
-            self.magazyn1 = self.parent.magazyn1
-            self.magazyn2 = self.parent.magazyn2
-            self.board = self.parent.board
-            self.bonus = self.parent.bonus
-            self.steal = self.parent.steal
+            self.k = np.copy(self.parent.k)
+            self.magazyn1 = np.copy(self.parent.magazyn1)
+            self.magazyn2 = np.copy(self.parent.magazyn2)
+            self.board = np.copy(self.parent.board)
+            self.bonus = np.copy(self.parent.bonus)
+            self.steal = np.copy(self.parent.steal)
+            # self.k = self.parent.k
+            # self.magazyn1 = self.parent.magazyn1
+            # self.magazyn2 = self.parent.magazyn2
+            # self.board = self.parent.board
+            # self.bonus = self.parent.bonus
+            # self.steal = self.parent.steal
         else:
             self.k = Kalah.KAMIENIE
-            self.magazyn1 = int8(0)
-            self.magazyn2 = int8(0)
+            self.magazyn1 = 0
+            self.magazyn2 = 0
             self.board = np.array([[self.k for i in range(Kalah.POLE)],[self.k for i in range(Kalah.POLE)]], dtype=np.int8)
             self.bonus = False
             self.steal = False
@@ -55,6 +55,8 @@ class Kalah(State):
             for j in range(Kalah.POLE):
                 s += '|'
                 s += str(self.board[i,j]) # kamienie w wierszach
+                if self.board[i,j] < 10:
+                    s += ' '
 
             s += '|'
             s += '   '
@@ -66,6 +68,13 @@ class Kalah(State):
 
             s += '\n'
         
+        # Do wyrównania planszy, gdy liczby są > 9
+        # for i in range(1,3):
+        #     for j in range(Kalah.POLE):
+        #         if self.board[i,j > 9]:
+        #             if i == 1:
+        #                 self.board[0, j]
+
         return s
     
     def get_player_row(self):
@@ -80,6 +89,20 @@ class Kalah(State):
         player_row = self.get_player_row()
         current_row = self.get_player_row()
         stones = self.board[player_row, action_index]
+        if stones == 0:
+            return False
+        if stones == 1:
+            if player_row == 1:
+                enemy_row = 0
+            else:
+                enemy_row = 1
+            enemy_stones = self.board[enemy_row, action_index]
+            self.board[enemy_row, action_index] = 0
+            if player_row == 1:
+                self.magazyn2 += enemy_stones
+            else:
+                self.magazyn1 += enemy_stones
+            
         self.board[player_row, action_index] = 0
 
         counter = int8(np.copy(self.turn))
@@ -139,7 +162,7 @@ class Kalah(State):
                     return 1
                 elif self.magazyn2>self.magazyn1:
                     return -1
-                else: # magazyn2 == magazyn1
+                elif self.magazyn2 == self.magazyn1:
                     return 0
             elif np.sum(self.board[0,:])==0:
                 self.magazyn1 += np.sum(self.board[1,:])
@@ -148,7 +171,7 @@ class Kalah(State):
                     return 1
                 elif self.magazyn2>self.magazyn1:
                     return -1
-                else: # magazyn2 == magazyn1
+                elif self.magazyn2 == self.magazyn1:
                     return 0
         return None    
    
@@ -163,7 +186,7 @@ class Kalah(State):
                 return 1
             elif magazyn2>magazyn1:
                 return -1
-            else: # magazyn2 == magazyn1
+            elif magazyn2 == magazyn1:
                 return 0
         elif np.sum(board[0,:])==0:
             magazyn1 += np.sum(board[1,:])
@@ -172,7 +195,7 @@ class Kalah(State):
                 return 1
             elif magazyn2>magazyn1:
                 return -1
-            else: # magazyn2 == magazyn1
+            elif magazyn2 == magazyn1:
                 return 0
         return -2 #zamiast None
                         
