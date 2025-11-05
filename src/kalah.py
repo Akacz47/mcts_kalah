@@ -19,22 +19,12 @@ class Kalah(State):
         if self.parent:
             self.k = np.copy(self.parent.k)
             self.magazyn = np.copy(self.parent.magazyn)
-            # self.magazyn1 = np.copy(self.parent.magazyn1)
-            # self.magazyn2 = np.copy(self.parent.magazyn2)
             self.board = np.copy(self.parent.board)
             self.bonus = np.copy(self.parent.bonus)
             self.steal = np.copy(self.parent.steal)
-            # self.k = self.parent.k
-            # self.magazyn1 = self.parent.magazyn1
-            # self.magazyn2 = self.parent.magazyn2
-            # self.board = self.parent.board
-            # self.bonus = self.parent.bonus
-            # self.steal = self.parent.steal
         else:
             self.k = Kalah.KAMIENIE
             self.magazyn = np.zeros(2,dtype=np.int8)
-            # self.magazyn1 = int8(0)
-            # self.magazyn2 = int8(0)
             self.board = np.array([[self.k for i in range(Kalah.POLE)],[self.k for i in range(Kalah.POLE)]], dtype=np.int8)
             self.bonus = False
             self.steal = False
@@ -48,7 +38,7 @@ class Kalah(State):
         s = ''
         for i in range(2):
             if i == 1:
-                s += str(self.magazyn[1]) # magazyn
+                s += str(self.magazyn[0]) # magazyn
             else:
                 s += ' '
 
@@ -65,7 +55,7 @@ class Kalah(State):
             s += '   '
 
             if i == 1:
-                s += str(self.magazyn[0]) # magazyn
+                s += str(self.magazyn[1]) # magazyn
             else:
                 s += ' '
 
@@ -92,18 +82,14 @@ class Kalah(State):
             return False
         if action_index>5 or action_index<0:
             return False
-        if stones == 1:
-            if player_row == 1:
-                enemy_row = 0
-            else:
-                enemy_row = 1
-            enemy_stones = self.board[enemy_row, action_index]
-            self.board[enemy_row, action_index] = 0
-            self.magazyn[player_row] += enemy_stones
-            # if player_row == 1:
-            #     self.magazyn[1] += enemy_stones
-            # else:
-            #     self.magazyn[0] += enemy_stones
+        # if stones == 1:
+        #     if player_row == 1:
+        #         enemy_row = 0
+        #     else:
+        #         enemy_row = 1
+        #     enemy_stones = self.board[enemy_row, action_index]
+        #     self.board[enemy_row, action_index] = 0
+        #     self.magazyn[player_row] += enemy_stones
 
         self.board[player_row, action_index] = 0
 
@@ -115,19 +101,19 @@ class Kalah(State):
                 action_index = Kalah.POLE-1
                 counter = 0
                 current_row = 0
-                if player_row == 1:
-                    self.magazyn[0] += 1
+                if player_row==1:
+                    self.magazyn[player_row] += 1
                     stones -= 1
-                    continue
+                continue
             elif idx < 0:
                 idx = 0
                 action_index = 0
                 counter = 0
                 current_row = 1
-                if player_row == 0:
-                    self.magazyn[1] += 1
+                if player_row==0:
+                    self.magazyn[player_row] += 1
                     stones -= 1
-                    continue
+                continue
             #print(idx)
             #idx = np.clip(idx,0,Kalah.POLE-1)
             self.board[current_row, idx] += 1
@@ -158,22 +144,22 @@ class Kalah(State):
                 return numba_outcome
         else: # pure Python
             if np.sum(self.board[1,:])==0:
-                self.magazyn[1] += np.sum(self.board[0,:])
+                self.magazyn[0] += np.sum(self.board[0,:])
                 self.board[0,:] = np.zeros_like(self.board[0,:])
                 if self.magazyn[0]>self.magazyn[1]:
-                    return 1
-                elif self.magazyn[1]>self.magazyn[0]:
                     return -1
-                else: # magazyn2 == magazyn1
+                elif self.magazyn[1]>self.magazyn[0]:
+                    return 1
+                elif self.magazyn[1] == self.magazyn[0]:
                     return 0
             elif np.sum(self.board[0,:])==0:
-                self.magazyn[0] += np.sum(self.board[1,:])
+                self.magazyn[1] += np.sum(self.board[1,:])
                 self.board[1,:] = np.zeros_like(self.board[1,:])
                 if self.magazyn[0]>self.magazyn[1]:
-                    return 1
-                elif self.magazyn[1]>self.magazyn[0]:
                     return -1
-                else: # magazyn2 == magazyn1
+                elif self.magazyn[1]>self.magazyn[0]:
+                    return 1
+                elif self.magazyn[1] == self.magazyn[0]:
                     return 0
         return None    
    
@@ -185,19 +171,19 @@ class Kalah(State):
             magazyn[1] += np.sum(board[0,:])
             board[0,:] = np.zeros_like(board[0,:])
             if magazyn[0]>magazyn[1]:
-                return 1
-            elif magazyn[1]>magazyn[0]:
                 return -1
-            else: # magazyn2 == magazyn1
+            elif magazyn[1]>magazyn[0]:
+                return 1
+            elif magazyn[1] == magazyn[0]:
                 return 0
         elif np.sum(board[0,:])==0:
             magazyn[0] += np.sum(board[1,:])
             board[1,:] = np.zeros_like(board[1,:])
             if magazyn[0]>magazyn[1]:
-                return 1
-            elif magazyn[1]>magazyn[0]:
                 return -1
-            else: # magazyn2 == magazyn1
+            elif magazyn[1]>magazyn[0]:
+                return 1
+            elif magazyn[1] == magazyn[0]:
                 return 0
         return -2 #zamiast None
                         
