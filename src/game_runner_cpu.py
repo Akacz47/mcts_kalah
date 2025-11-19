@@ -28,7 +28,7 @@ class GameRunner:
             list of strings with messages describing outcomes of games.
     """
     
-    OUTCOME_MESSAGES = ["WHITE WINS", "DRAW", "BLACK WINS"]
+    OUTCOME_MESSAGES = ["SECOND PLAYER WINS", "DRAW", "FIRST PLAYER WINS"]
     
     def __init__(self, game_class, black_ai, white_ai, game_index, n_games, experiment_info_old=None):
         """
@@ -71,7 +71,7 @@ class GameRunner:
                 escaped = False
                 while not (move_valid or escaped):
                     try:
-                        move_name = input("BLACK PLAYER, PICK YOUR MOVE: ")
+                        move_name = input("FIRST PLAYER, PICK YOUR MOVE: ")
                         move_index = self.game_class.action_name_to_index(move_name)
                         print(f"MOVE INDEX: {move_name}")
                         game_moved = game.take_action(move_index)
@@ -81,8 +81,8 @@ class GameRunner:
                             move_valid = True                                                        
                     except Exception as e:
                         print(f"INVALID MOVE. GAME STOPPED. {e}")
-                        escaped = True
-                        break
+                        #escaped = True
+                        continue
                 if escaped:
                     break
             else:
@@ -111,7 +111,7 @@ class GameRunner:
                 escaped = False
                 while not (move_valid or escaped):
                     try:
-                        move_name = input("WHITE PLAYER, PICK YOUR MOVE: ")
+                        move_name = input("SECOND PLAYER, PICK YOUR MOVE: ")
                         move_index = self.game_class.action_name_to_index(move_name)
                         print(f"MOVE INDEX: {move_name}")
                         game_moved = game.take_action(move_index)
@@ -121,8 +121,8 @@ class GameRunner:
                             move_valid = True                            
                     except Exception as e:
                         print(f"INVALID MOVE. GAME STOPPED. {e}")
-                        escaped = True
-                        break
+                        #escaped = True
+                        continue
                 if escaped:
                     break                
             else:
