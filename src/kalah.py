@@ -191,7 +191,7 @@ class Kalah(State):
     def compute_outcome_job_numba_jit(board,magazyn):
         """Called by ``compute_outcome_job`` for faster outcomes."""  
         if np.sum(board[1,:])==0:
-            magazyn[1] += np.sum(board[0,:])
+            magazyn[0] += np.sum(board[0,:])
             board[0,:] = np.zeros_like(board[0,:])
             if magazyn[0]>magazyn[1]:
                 return -1
@@ -200,7 +200,7 @@ class Kalah(State):
             elif magazyn[1] == magazyn[0]:
                 return 0
         elif np.sum(board[0,:])==0:
-            magazyn[0] += np.sum(board[1,:])
+            magazyn[1] += np.sum(board[1,:])
             board[1,:] = np.zeros_like(board[1,:])
             if magazyn[0]>magazyn[1]:
                 return -1
