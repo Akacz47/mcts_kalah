@@ -84,7 +84,8 @@ def compute_outcome(m, n, board, extra_info, turn, last_action): # any outcome o
     Computes and returns the outcome of game state represented by ``board`` and ``extra_info`` arrays. 
     Outcomes ``{-1, 1}`` denote a win by minimizing or maximizing player, respectively. ``0`` denotes a tie. Any other outcome denotes an ongoing game.
     """    
-    return compute_outcome_c4(m, n, board, extra_info, turn, last_action)
+    return compute_outcome_kallah(m, n, board, extra_info, turn, last_action)
+    #return compute_outcome_c4(m, n, board, extra_info, turn, last_action)
     #return compute_outcome_gomoku(m, n, board, extra_info, turn, last_action)    
 
 @cuda.jit(device=True)
@@ -126,6 +127,36 @@ def take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, le
     extra_info[action] += 1
     row = m - extra_info[action]
     board[row, action] = turn
+
+@cuda.jit(device=True)
+def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
+    # suma = 0
+    # for i in range(len(board[1,:])):
+    if sum(board[1,:])==0:
+        #magazyn[0] += sum(board[0,:])
+        extra_info[0] += sum(board[0,:])
+        #board[0,:] = np.zeros_like(board[0,:])
+        for i in range(len(board[0,:])):
+            board[0,i] = 0
+        if extra_info[0]>extra_info[1]:
+            return -1
+        elif extra_info[1]>extra_info[0]:
+            return 1
+        elif extra_info[1] == extra_info[0]:
+            return 0
+    elif sum(board[0,:])==0:
+        #magazyn[1] += sum(board[1,:])
+        extra_info[1] += sum(board[1,:])
+        #board[1,:] = np.zeros_like(board[1,:])
+        for i in range(len(board[1,:])):
+            board[1,i] = 0
+        if extra_info[0]>extra_info[1]:
+            return -1
+        elif extra_info[1]>extra_info[0]:
+            return 1
+        elif extra_info[1] == extra_info[0]:
+            return 0
+    return -2 #zamiast None
 
 @cuda.jit(device=True)
 def compute_outcome_c4(m, n, board, extra_info, turn, last_action):
