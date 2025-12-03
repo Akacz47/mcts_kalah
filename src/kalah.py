@@ -147,6 +147,7 @@ class Kalah(State):
             stones -= 1
 
         self.turn *= -1
+
         return True
     
     def compute_outcome_job(self):    
@@ -245,7 +246,8 @@ class Kalah(State):
             extra_info (ndarray[np.int8, ndim=1] or ``None``):
                 one-dimensional array with additional information associated with this state - fills of columns.        
         """
-        return None  
+        #return None
+        return self.column_fills
     
     @staticmethod    
     def action_name_to_index(action_name):     

@@ -56,8 +56,9 @@ __email__ = "pklesk@zut.edu.pl"
 @cuda.jit(device=True)
 def is_action_legal(m, n, board, extra_info, turn, action, legal_actions):
     """Checks whether action defined by index ``action`` is legal and leaves the result (a boolean indicator) in array ``legal_actions`` under that index."""
-    is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions)
-    #is_action_legal_gomoku(m, n, board, extra_info, turn, action, legal_actions)    
+    # is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions)
+    #is_action_legal_gomoku(m, n, board, extra_info, turn, action, legal_actions)
+    is_action_legal_kallah(m, n, board, extra_info, turn, action, legal_actions)  
 
 @cuda.jit(device=True)
 def take_action(m, n, board, extra_info, turn, action):
@@ -90,6 +91,17 @@ def compute_outcome(m, n, board, extra_info, turn, last_action): # any outcome o
 def is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions):
     """Functionality of function ``is_action_legal`` for the game of Connect 4.""" 
     legal_actions[action] = True if extra_info[action] < m else False
+
+@cuda.jit(device=True)
+def is_action_legal_kallah(m, n, board, extra_info, turn, action, legal_actions):
+    """Functionality of function ``is_action_legal`` for the game of Connect 4.""" 
+    # legal_actions[action] = True if extra_info[action] < m else False
+    if action > 5 or action < 0:
+        legal_actions[action] = False
+
+    
+    legal_actions[action] = True
+
     
 @cuda.jit(device=True)
 def take_action_c4(m, n, board, extra_info, turn, action):
