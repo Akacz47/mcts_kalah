@@ -227,6 +227,36 @@ def take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, le
     board[row, action] = turn
 
 @cuda.jit(device=True)
+def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
+    # suma = 0
+    # for i in range(len(board[1,:])):
+    if sum(board[1,:])==0:
+        #magazyn[0] += sum(board[0,:])
+        extra_info[0] += sum(board[0,:])
+        #board[0,:] = np.zeros_like(board[0,:])
+        for i in range(len(board[0,:])):
+            board[0,i] = 0
+        if extra_info[0]>extra_info[1]:
+            return -1
+        elif extra_info[1]>extra_info[0]:
+            return 1
+        elif extra_info[1] == extra_info[0]:
+            return 0
+    elif sum(board[0,:])==0:
+        #magazyn[1] += sum(board[1,:])
+        extra_info[1] += sum(board[1,:])
+        #board[1,:] = np.zeros_like(board[1,:])
+        for i in range(len(board[1,:])):
+            board[1,i] = 0
+        if extra_info[0]>extra_info[1]:
+            return -1
+        elif extra_info[1]>extra_info[0]:
+            return 1
+        elif extra_info[1] == extra_info[0]:
+            return 0
+    return -2 #zamiast None
+
+@cuda.jit(device=True)
 def take_action_playout_kallah(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count):
     take_action_kallah(m, n, board, extra_info, turn, action)
 
