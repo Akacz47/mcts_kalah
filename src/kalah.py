@@ -147,6 +147,7 @@ class Kalah(State):
             stones -= 1
 
         self.turn *= -1
+
         return True
     
     def compute_outcome_job(self):    
@@ -236,7 +237,6 @@ class Kalah(State):
         return self.board
     
     def get_extra_info(self):
-        #TODO
         """
         Returns additional information associated with this state, as one-dimensional array of bytes,
         informing about fills of columns (how many discs have been dropped in each column). 
@@ -245,11 +245,22 @@ class Kalah(State):
             extra_info (ndarray[np.int8, ndim=1] or ``None``):
                 one-dimensional array with additional information associated with this state - fills of columns.        
         """
-        return None  
+        extra = np.empty(5,dtype=np.int8)
+        extra[:1] = self.magazyn
+        extra[2] = self.bonus1
+        extra[3] = self.bonus2
+        extra[4] = self.steal
+        return extra
     
     @staticmethod    
-    def action_name_to_index(action_name):     
-        return int(action_name)
+    def action_name_to_index(action_name):   
+        try:  
+            index =  int(action_name)
+        except:
+            index = 6
+        if index<0 or index>5:
+            index = 6
+        return index
 
     @staticmethod
     def action_index_to_name(action_index):      
