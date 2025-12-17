@@ -246,7 +246,8 @@ class Kalah(State):
                 one-dimensional array with additional information associated with this state - fills of columns.        
         """
         extra = np.empty(5,dtype=np.int8)
-        extra[:1] = self.magazyn
+        extra[0] = self.magazyn[0]
+        extra[1] = self.magazyn[1]
         extra[2] = self.bonus1
         extra[3] = self.bonus2
         extra[4] = self.steal
@@ -272,7 +273,7 @@ class Kalah(State):
 
     @staticmethod
     def get_extra_info_memory():      
-        return 2*Kalah.POLE + 2
+        return 5
 
     @staticmethod
     def get_max_actions():

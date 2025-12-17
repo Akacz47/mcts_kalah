@@ -57,21 +57,21 @@ __email__ = "pklesk@zut.edu.pl"
 @cuda.jit(device=True)
 def is_action_legal(m, n, board, extra_info, turn, action, legal_actions):
     """Checks whether action defined by index ``action`` is legal and leaves the result (a boolean indicator) in array ``legal_actions`` under that index."""
-    # is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions)
+    #is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions)
     #is_action_legal_gomoku(m, n, board, extra_info, turn, action, legal_actions)
     is_action_legal_kallah(m, n, board, extra_info, turn, action, legal_actions)  
 
 @cuda.jit(device=True)
 def take_action(m, n, board, extra_info, turn, action):
     """Takes action defined by index ``action`` during an expansion - modifies the ``board`` and possibly ``extra_info`` arrays."""    
-    # take_action_c4(m, n, board, extra_info, turn, action)
+    #take_action_c4(m, n, board, extra_info, turn, action)
     #take_action_gomoku(m, n, board, extra_info, turn, action)
     take_action_kallah(m, n, board, extra_info, turn, action)
 
 @cuda.jit(device=True)
 def legal_actions_playout(m, n, board, extra_info, turn, legal_actions_with_count):
     """Establishes legal actions and their count during a playout; leaves the results in array ``legal_actions_with_count``."""
-    # legal_actions_playout_c4(m, n, board, extra_info, turn, legal_actions_with_count)    
+    #legal_actions_playout_c4(m, n, board, extra_info, turn, legal_actions_with_count)    
     #legal_actions_playout_gomoku(m, n, board, extra_info, turn, legal_actions_with_count)    
     legal_actions_playout_kallah(m, n, board, extra_info, turn, legal_actions_with_count)    
 
@@ -79,7 +79,7 @@ def legal_actions_playout(m, n, board, extra_info, turn, legal_actions_with_coun
 @cuda.jit(device=True)    
 def take_action_playout(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count):
     """Takes action defined by index ``action`` during a playout - modifies the ``board`` and possibly arrays: ``extra_info``, ``legal_actions_with_count``."""
-    # take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count)
+    #take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count)
     #take_action_playout_gomoku(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count)
     take_action_playout_kallah(m, n, board, extra_info, turn, action, action_ord, legal_actions_with_count)
     
@@ -89,7 +89,7 @@ def compute_outcome(m, n, board, extra_info, turn, last_action): # any outcome o
     Computes and returns the outcome of game state represented by ``board`` and ``extra_info`` arrays. 
     Outcomes ``{-1, 1}`` denote a win by minimizing or maximizing player, respectively. ``0`` denotes a tie. Any other outcome denotes an ongoing game.
     """    
-    # return compute_outcome_c4(m, n, board, extra_info, turn, last_action)
+    #return compute_outcome_c4(m, n, board, extra_info, turn, last_action)
     #return compute_outcome_gomoku(m, n, board, extra_info, turn, last_action)    
     return compute_outcome_kallah(m, n, board, extra_info, turn, last_action)
 
@@ -126,7 +126,7 @@ def take_action_c4(m, n, board, extra_info, turn, action):
 @cuda.jit(device=True)
 def take_action_kallah(m, n, board, extra_info, turn, action):
     if extra_info[3]: #dla wyświetlienia
-            extra_info[3] = 0
+        extra_info[3] = 0
 
     if extra_info[2]: #ruch pusty nie zależnie od indexu
         extra_info[2] = 0
@@ -142,7 +142,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
 
     board[player_row, action] = 0
 
-    counter = int8(np.copy(turn)) 
+    counter = turn
     while stones != 0:
         idx = action + counter
         if idx == board.shape[1]:
@@ -228,11 +228,20 @@ def take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, le
 
 @cuda.jit(device=True)
 def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
-    # suma = 0
-    # for i in range(len(board[1,:])):
-    if sum(board[1,:])==0:
+    suma1 = 0
+    for i in range(len(board[1,:])):
+        suma1 += board[1,i]
+    suma3 = 0
+    for i in range(len(board[0,:])):
+        suma3 += board[0,i]
+    #if sum(board[1,:])==0:
+    if suma1 == 0:
         #magazyn[0] += sum(board[0,:])
-        extra_info[0] += sum(board[0,:])
+        suma2 = 0
+        for i in range(len(board[0,:])):
+            suma2 += board[0,i]
+        #extra_info[0] += sum(board[0,:])
+        extra_info[0] += suma2
         #board[0,:] = np.zeros_like(board[0,:])
         for i in range(len(board[0,:])):
             board[0,i] = 0
@@ -242,9 +251,12 @@ def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
             return 1
         elif extra_info[1] == extra_info[0]:
             return 0
-    elif sum(board[0,:])==0:
+    elif suma3==0:
         #magazyn[1] += sum(board[1,:])
-        extra_info[1] += sum(board[1,:])
+        suma2 = 0
+        for i in range(len(board[1,:])):
+            suma2 += board[1,i]
+        extra_info[1] += suma2
         #board[1,:] = np.zeros_like(board[1,:])
         for i in range(len(board[1,:])):
             board[1,i] = 0

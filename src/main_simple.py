@@ -1,13 +1,16 @@
 import numpy as np
 from mcts import MCTS
+from mctsnc import MCTSNC
 from c4 import C4
 from game_runner import GameRunner
 from kalah import Kalah
  
+
 if __name__=="__main__":
-    AI = MCTS(search_time_limit=5, search_steps_limit=np.inf, vanilla=True)
-    #game_runner = GameRunner(C4,None,AI,0,1,None)
-    game_runner = GameRunner(Kalah,AI,AI,0,1,None) # None, AI
+    #AI = MCTSNC(Kalah.get_board_shape(), Kalah.get_extra_info_memory(), Kalah.get_max_actions(), search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_prodigal", action_index_to_name_function=Kalah.action_index_to_name)# MCTSNC(search_time_limit=5.0, search_steps_limit=np.inf)
+    AI = MCTSNC(C4.get_board_shape(), C4.get_extra_info_memory(), C4.get_max_actions(), search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=32, variant="ocp_thrifty", action_index_to_name_function=C4.action_index_to_name)
+    game_runner = GameRunner(C4,None,AI,0,1,None)
+    #game_runner = GameRunner(Kalah,AI,AI,0,1,None) # None, AI
     outcome,game_info = game_runner.run()
 
     # plik mechanics
@@ -59,3 +62,7 @@ if __name__=="__main__":
 
     # wybrać 4 z tych 5 punktów i będzie ocena na 5
     # jakby się nie zdążyło to na teams albo na projekcie się odezwać
+'''
+if __name__=="__main__":
+    print("hello")
+    '''

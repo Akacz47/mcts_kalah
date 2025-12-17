@@ -148,6 +148,7 @@ described by ``@cuda.jit`` decorators coming from ``numba`` module. Exact specif
 For public methods full docstrings are provided (with arguments and returns described). For private functions short docstrings are provided.    
 
 """
+import sys
 import warnings
 from numba.core.errors import NumbaPerformanceWarning
 warnings.simplefilter("ignore", category=NumbaPerformanceWarning)
