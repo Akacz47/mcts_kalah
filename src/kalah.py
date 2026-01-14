@@ -269,7 +269,7 @@ class Kalah(State):
     
     @staticmethod
     def get_board_shape():      
-        return (Kalah.POLE, 2)
+        return (2,Kalah.POLE)
 
     @staticmethod
     def get_extra_info_memory():      
@@ -284,5 +284,5 @@ class Kalah(State):
             max_actions (int):
                 maximum number of actions (the largest branching factor) equal to the number of columns.
         """                
-        return Kalah.POLE
+        return Kalah.POLE+1
     
