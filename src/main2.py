@@ -37,7 +37,7 @@ __email__ = "pklesk@zut.edu.pl"
 
 # main settings
 STATE_CLASS = Kalah # Kalah or Gomoku
-N_GAMES = 4
+N_GAMES = 6
 AI_A_SHORTNAME = "mctsnc_1_inf_1_32_acp_prodigal" 
 AI_B_SHORTNAME = "mcts_1_inf_vanilla"
 #WHITE WINS (-1): 4, DRAWS (0): 0, BLACK WINS (+1): 1
