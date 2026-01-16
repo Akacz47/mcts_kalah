@@ -229,21 +229,21 @@ def take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, le
 @cuda.jit(device=True)
 def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
     suma1 = 0
-    for i in range(len(board[1,:])):
+    for i in range(len(board[:,1])):
         suma1 += board[1,i]
     suma3 = 0
-    for i in range(len(board[0,:])):
+    for i in range(len(board[:,1])):
         suma3 += board[0,i]
     #if sum(board[1,:])==0:
     if suma1 == 0:
         #magazyn[0] += sum(board[0,:])
         suma2 = 0
-        for i in range(len(board[0,:])):
+        for i in range(len(board[:,1])):
             suma2 += board[0,i]
         #extra_info[0] += sum(board[0,:])
         extra_info[0] += suma2
         #board[0,:] = np.zeros_like(board[0,:])
-        for i in range(len(board[0,:])):
+        for i in range(len(board[:,0])):
             board[0,i] = 0
         if extra_info[0]>extra_info[1]:
             return -1
@@ -254,11 +254,11 @@ def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
     elif suma3==0:
         #magazyn[1] += sum(board[1,:])
         suma2 = 0
-        for i in range(len(board[1,:])):
+        for i in range(len(board[:,1])):
             suma2 += board[1,i]
         extra_info[1] += suma2
         #board[1,:] = np.zeros_like(board[1,:])
-        for i in range(len(board[1,:])):
+        for i in range(len(board[:,1])):
             board[1,i] = 0
         if extra_info[0]>extra_info[1]:
             return -1
