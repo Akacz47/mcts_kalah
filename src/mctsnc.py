@@ -1394,6 +1394,8 @@ class MCTSNC:
         if t == 0:
             if not selected_is_terminal:
                 for i in range(state_max_actions):
+                    # print(i)
+                    # print(shared_legal_actions[i])
                     if shared_legal_actions[i] and size_so_far + child_shift + 1 < max_tree_size:
                         child_shift += 1
                     shared_legal_actions_child_shifts[i] = child_shift                                
