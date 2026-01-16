@@ -190,7 +190,8 @@ def save_and_zip_experiment(experiment_hs, experiment_info, folder):
         os.remove(fpath + ".json")
         os.remove(fpath + ".log") 
     except IOError:
-        sys.exit(f"[error occurred when trying to save and zip experiment info: {fname}]")            
+        pass
+        #sys.exit(f"[error occurred when trying to save and zip experiment info: {fname}]")            
     t2 = time.time()
     print(f"SAVE AND ZIP EXPERIMENT DONE. [time: {t2 - t1} s]")
 

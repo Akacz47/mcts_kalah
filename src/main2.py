@@ -37,11 +37,14 @@ __email__ = "pklesk@zut.edu.pl"
 
 # main settings
 STATE_CLASS = Kalah # Kalah or Gomoku
-N_GAMES = 1
-AI_A_SHORTNAME = None # human
-AI_B_SHORTNAME = "mctsnc_30_inf_4_128_ocp_thrifty_16g"
-# AI_B_SHORTNAME = "mcts_5_inf_vanilla" 
+N_GAMES = 3
+AI_A_SHORTNAME = "mctsnc_5_inf_4_256_acp_prodigal" 
+AI_B_SHORTNAME = None
 REPRODUCE_EXPERIMENT = False
+# GPU acp
+# GPU/GPU
+# more time
+# with bot 
 
 # folders
 FOLDER_EXPERIMENTS = "../experiments/"
@@ -62,9 +65,9 @@ if _HUMAN_PARTICIPANT:
 
 # dictionary of AIs
 AIS = {
-    # "mcts_1_inf_vanilla": MCTS(search_time_limit=1.0, search_steps_limit=np.inf, vanilla=True),
-    # "mcts_5_inf_vanilla": MCTS(search_time_limit=5.0, search_steps_limit=np.inf, vanilla=True),
-    # "mcts_30_inf_vanilla": MCTS(search_time_limit=30.0, search_steps_limit=np.inf, vanilla=True),        
+    "mcts_1_inf_vanilla": MCTS(search_time_limit=1.0, search_steps_limit=np.inf, vanilla=True),
+    "mcts_3_inf_vanilla": MCTS(search_time_limit=3.0, search_steps_limit=np.inf, vanilla=True),
+    "mcts_30_inf_vanilla": MCTS(search_time_limit=30.0, search_steps_limit=np.inf, vanilla=True),        
     "mctsnc_1_inf_1_32_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=32, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_1_inf_1_64_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=64, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_1_inf_1_128_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=128, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
@@ -130,10 +133,10 @@ AIS = {
     "mctsnc_1_inf_8_128_acp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=8, n_playouts=128, variant="acp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_1_inf_8_256_acp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=8, n_playouts=256, variant="acp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_5_inf_4_128_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=128, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
-    "mctsnc_5_inf_4_256_ocp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),    
+    "mctsnc_3_inf_4_256_ocp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=3.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),    
     "mctsnc_5_inf_4_256_acp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_5_inf_4_256_acp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),                                                                    
-    "mctsnc_30_inf_4_128_ocp_thrifty_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=10000.0, search_steps_limit=1000, n_trees=1, n_playouts=32, variant="ocp_thrifty", device_memory=1.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
+    "mctsnc_3_inf_4_256_ocp_thrifty_1g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=3.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_thrifty", device_memory=1.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_30_inf_4_256_ocp_prodigal_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_prodigal", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),        
     "mctsnc_30_inf_4_256_acp_thrifty_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_thrifty", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_30_inf_4_256_acp_prodigal_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_prodigal", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION)                            
@@ -155,8 +158,9 @@ if __name__ == "__main__":
     experiment_hs = experiment_hash_str(matchup_info, c_props, g_props)
     experiment_info = {"matchup_info":  matchup_info, "cpu_and_system_props": c_props, "gpu_props": g_props, "games_infos": {}, "stats": {}}
     if not (REPRODUCE_EXPERIMENT or _HUMAN_PARTICIPANT):
-        logger = Logger(f"{FOLDER_EXPERIMENTS}{experiment_hs}.log")    
-        sys.stdout = logger
+        pass
+        #logger = Logger(f"{FOLDER_EXPERIMENTS}{experiment_hs}.log")    
+        #sys.stdout = logger
     
     print("MCTS-NC EXPERIMENT..." + f"{' [to be reproduced]' if REPRODUCE_EXPERIMENT else ''}", flush=True)
     t1 = time.time()    
@@ -228,5 +232,5 @@ if __name__ == "__main__":
     
     if not (REPRODUCE_EXPERIMENT or _HUMAN_PARTICIPANT):
         sys.stdout = sys.__stdout__
-        logger.logfile.close()
+        #logger.logfile.close()
         save_and_zip_experiment(experiment_hs, experiment_info, FOLDER_EXPERIMENTS)
