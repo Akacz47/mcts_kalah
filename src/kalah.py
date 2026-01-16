@@ -8,7 +8,7 @@ __author__ = ""
 __email__ = "" 
 
 class Kalah(State):
-    # TODO: konstanty dla gry   
+    # konstanty dla gry   
     POLE = 6
     KAMIENIE = 4
     PLAYER1_ROW = 1
@@ -20,13 +20,15 @@ class Kalah(State):
             self.k = np.copy(self.parent.k)
             self.magazyn = np.copy(self.parent.magazyn)
             self.board = np.copy(self.parent.board)
-            self.bonus = np.copy(self.parent.bonus)
+            self.bonus1 = np.copy(self.parent.bonus1)
+            self.bonus2 = np.copy(self.parent.bonus2)
             self.steal = np.copy(self.parent.steal)
         else:
             self.k = Kalah.KAMIENIE
             self.magazyn = np.zeros(2,dtype=np.int8)
             self.board = np.array([[self.k for i in range(Kalah.POLE)],[self.k for i in range(Kalah.POLE)]], dtype=np.int8)
-            self.bonus = False
+            self.bonus1 = False
+            self.bonus2 = False
             self.steal = False
 
     @staticmethod
@@ -34,7 +36,8 @@ class Kalah(State):
         return f"{Kalah.__name__}_{Kalah.POLE}x{2}"
             
     def __str__(self): 
-        #TODO: "pysty" rych kiedy bonus     
+        if   self.bonus2: #pusty ruch
+            return "ANOTHER PLAYER HAS BONUS MOVE" 
         s = ''
         for i in range(2):
             if i == 1:
@@ -72,14 +75,23 @@ class Kalah(State):
 
     
     def take_action_job(self, action_index):
-        # Pojedynczy ruch
-        # Ruch pusty jako 0 potem zrobić albo ruch pusty jako 6
-        # bonus zrobic
+        if self.bonus2: #dla wyświetlienia
+            self.bonus2 = False
+
+        if self.bonus1: #ruch pusty nie zależnie od indexu
+            self.bonus1 = False
+            self.bonus2 = True
+            self.turn *= -1
+            return True
+
+        if  action_index > 5 or action_index < 0:
+            return False
+            
         player_row = self.get_player_row()
         current_row = self.get_player_row()
         stones = self.board[player_row, action_index]
 
-        if stones == 0 or action_index > 5 or action_index < 0:
+        if stones == 0:
             return False
 
         self.board[player_row, action_index] = 0
@@ -95,6 +107,10 @@ class Kalah(State):
                 if player_row == 1:
                     self.magazyn[player_row] += 1
                     stones -= 1
+                    if stones == 0: #bonus ruch
+                        self.bonus1 = True
+                        self.turn *= -1
+                        return True
                 continue      
             elif idx < 0:
                 idx = 0
@@ -104,6 +120,10 @@ class Kalah(State):
                 if player_row == 0:
                     self.magazyn[player_row] += 1
                     stones -= 1
+                    if stones == 0: #bonus ruch
+                        self.bonus1 = True
+                        self.turn *= -1
+                        return True
                 continue
             #print(idx)
             #idx = np.clip(idx,0,Kalah.POLE-1)
@@ -114,8 +134,11 @@ class Kalah(State):
                     enemy_row = 0
                 else:
                     enemy_row = 1
-                self.magazyn[player_row] += self.board[enemy_row, idx]
-                self.board[enemy_row, idx] = 0
+                if self.board[enemy_row, idx] > 0: 
+                    #steal only if the enemy has what to steal
+                    self.magazyn[player_row] += self.board[enemy_row, idx] + 1
+                    self.board[enemy_row, idx] = 0
+                    self.board[current_row, idx] -= 1
             self.board[current_row, idx] += 1
             if current_row == 1:
                 counter += 1
@@ -124,6 +147,7 @@ class Kalah(State):
             stones -= 1
 
         self.turn *= -1
+
         return True
     
     def compute_outcome_job(self):    
@@ -168,7 +192,7 @@ class Kalah(State):
     def compute_outcome_job_numba_jit(board,magazyn):
         """Called by ``compute_outcome_job`` for faster outcomes."""  
         if np.sum(board[1,:])==0:
-            magazyn[1] += np.sum(board[0,:])
+            magazyn[0] += np.sum(board[0,:])
             board[0,:] = np.zeros_like(board[0,:])
             if magazyn[0]>magazyn[1]:
                 return -1
@@ -177,7 +201,7 @@ class Kalah(State):
             elif magazyn[1] == magazyn[0]:
                 return 0
         elif np.sum(board[0,:])==0:
-            magazyn[0] += np.sum(board[1,:])
+            magazyn[1] += np.sum(board[1,:])
             board[1,:] = np.zeros_like(board[1,:])
             if magazyn[0]>magazyn[1]:
                 return -1
@@ -213,7 +237,6 @@ class Kalah(State):
         return self.board
     
     def get_extra_info(self):
-        #TODO
         """
         Returns additional information associated with this state, as one-dimensional array of bytes,
         informing about fills of columns (how many discs have been dropped in each column). 
@@ -222,62 +245,35 @@ class Kalah(State):
             extra_info (ndarray[np.int8, ndim=1] or ``None``):
                 one-dimensional array with additional information associated with this state - fills of columns.        
         """
-        return None  
+        extra = np.empty(5,dtype=np.int8)
+        extra[0] = self.magazyn[0]
+        extra[1] = self.magazyn[1]
+        extra[2] = self.bonus1
+        extra[3] = self.bonus2
+        extra[4] = self.steal
+        return extra
     
     @staticmethod    
-    def action_name_to_index(action_name):
-        #TODO
-        """
-        Returns an action's index (numbering from 0) based on its name. E.g., name ``"0"``, denoting a drop into the leftmost column, maps to index ``0``.
-        
-        Args:
-            action_name (str):
-                name of an action.
-        Returns:
-            action_index (int):
-                index corresponding to the given name.   
-        """        
-        return int(action_name)
+    def action_name_to_index(action_name):   
+        try:  
+            index =  int(action_name)
+        except:
+            index = 6
+        if index<0 or index>5:
+            index = 6
+        return index
 
     @staticmethod
-    def action_index_to_name(action_index):
-        #TODO
-        """        
-        Returns an action's name based on its index (numbering from 0). E.g., index ``0`` maps to name ``"0"``, denoting a drop into the leftmost column.
-        
-        Args:
-            action_index (int):
-                index of an action.
-        Returns:
-            action_name (str):
-                name corresponding to the given index.          
-        """        
+    def action_index_to_name(action_index):      
         return str(action_index)
     
     @staticmethod
-    def get_board_shape():
-        #TODO
-        """
-        Returns a tuple with shape of boards for Connect 4 game.
-        
-        Returns:
-            shape (tuple(int, int)):
-                shape of boards related to states of this class.
-        """        
+    def get_board_shape():      
         return (Kalah.POLE, 2)
 
     @staticmethod
-    def get_extra_info_memory():
-        #TODO
-        """        
-        Returns amount of memory (in bytes) needed to memorize additional information associated with Connect 4 states, i.e., the memory for fills of columns.
-        That number is equal to the number of columns.
-        
-        Returns:
-            extra_info_memory (int):
-                number of bytes required to memorize fills of columns.         
-        """        
-        return 2*Kalah.POLE + 2
+    def get_extra_info_memory():      
+        return 5
 
     @staticmethod
     def get_max_actions():

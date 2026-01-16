@@ -9,7 +9,7 @@ The following variables allow to define the settings of an experiment:
 .. code-block:: python
     
     # main settings
-    STATE_CLASS = C4 # C4 or Gomoku
+    STATE_CLASS = Kalah # Kalah or Gomoku
     N_GAMES = 10
     AI_A_SHORTNAME = None # human
     AI_B_SHORTNAME = "mctsnc_5_inf_4_256_acp_prodigal" 
@@ -25,7 +25,7 @@ Link to project repository
 import numpy as np
 from mcts import MCTS
 from mctsnc import MCTSNC
-from c4 import C4
+from kalah import Kalah
 from gomoku import Gomoku
 from game_runner import GameRunner
 import time
@@ -36,10 +36,10 @@ __author__ = "Przemysław Klęsk"
 __email__ = "pklesk@zut.edu.pl"
 
 # main settings
-STATE_CLASS = C4 # C4 or Gomoku
-N_GAMES = 10
+STATE_CLASS = Kalah # Kalah or Gomoku
+N_GAMES = 1
 AI_A_SHORTNAME = None # human
-AI_B_SHORTNAME = "mctsnc_5_inf_4_256_acp_prodigal"
+AI_B_SHORTNAME = "mctsnc_30_inf_4_128_ocp_thrifty_16g"
 # AI_B_SHORTNAME = "mcts_5_inf_vanilla" 
 REPRODUCE_EXPERIMENT = False
 
@@ -62,9 +62,9 @@ if _HUMAN_PARTICIPANT:
 
 # dictionary of AIs
 AIS = {
-    "mcts_1_inf_vanilla": MCTS(search_time_limit=1.0, search_steps_limit=np.inf, vanilla=True),
-    "mcts_5_inf_vanilla": MCTS(search_time_limit=5.0, search_steps_limit=np.inf, vanilla=True),
-    "mcts_30_inf_vanilla": MCTS(search_time_limit=30.0, search_steps_limit=np.inf, vanilla=True),        
+    # "mcts_1_inf_vanilla": MCTS(search_time_limit=1.0, search_steps_limit=np.inf, vanilla=True),
+    # "mcts_5_inf_vanilla": MCTS(search_time_limit=5.0, search_steps_limit=np.inf, vanilla=True),
+    # "mcts_30_inf_vanilla": MCTS(search_time_limit=30.0, search_steps_limit=np.inf, vanilla=True),        
     "mctsnc_1_inf_1_32_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=32, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_1_inf_1_64_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=64, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_1_inf_1_128_ocp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=1, n_playouts=128, variant="ocp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
@@ -133,7 +133,7 @@ AIS = {
     "mctsnc_5_inf_4_256_ocp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),    
     "mctsnc_5_inf_4_256_acp_thrifty": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_thrifty", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_5_inf_4_256_acp_prodigal": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=5.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_prodigal", action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),                                                                    
-    "mctsnc_30_inf_4_128_ocp_thrifty_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=128, variant="ocp_thrifty", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
+    "mctsnc_30_inf_4_128_ocp_thrifty_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=1.0, search_steps_limit=np.inf, n_trees=4, n_playouts=128, variant="ocp_thrifty", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_30_inf_4_256_ocp_prodigal_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="ocp_prodigal", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),        
     "mctsnc_30_inf_4_256_acp_thrifty_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_thrifty", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION),
     "mctsnc_30_inf_4_256_acp_prodigal_16g": MCTSNC(_BOARD_SHAPE, _EXTRA_INFO_MEMORY, _MAX_ACTIONS, search_time_limit=30.0, search_steps_limit=np.inf, n_trees=4, n_playouts=256, variant="acp_prodigal", device_memory=16.0, action_index_to_name_function=_ACTION_INDEX_TO_NAME_FUNCTION)                            
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         print(f"BLACK: {black_player_ai if black_player_ai else 'human'}")
         print(f"WHITE: {white_player_ai if white_player_ai else 'human'}")
         game_runner = GameRunner(STATE_CLASS, black_player_ai, white_player_ai, i + 1, N_GAMES, experiment_info_old)
-        #game_runner = GameRunner(C4, None, None, 0, 1, None)
+        #game_runner = GameRunner(Kalah\, None, None, 0, 1, None)
         outcome, game_info = game_runner.run()
         experiment_info["games_infos"][str(i + 1)] = game_info
         outcomes[i] = outcome
