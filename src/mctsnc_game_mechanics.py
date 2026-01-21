@@ -157,7 +157,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
         idx = action + counter
         if idx == board.shape[1]:
             idx = board.shape[1]-1
-            action = board.shape[1]-1
+            #action = board.shape[1]-1
             counter = 0
             current_row = 0
             if player_row == 1:
@@ -169,7 +169,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
             continue      
         elif idx < 0:
             idx = 0
-            action = 0
+            #action = 0
             counter = 0
             current_row = 1
             if player_row == 0:
@@ -192,7 +192,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
                 #steal only if the enemy has what to steal
                 extra_info[player_row] += board[enemy_row, idx] + 1
                 board[enemy_row, idx] = 0
-                board[current_row, idx] -= 1
+                board[current_row, idx] = 0
         board[current_row, idx] += 1
         if current_row == 1:
             counter += 1
