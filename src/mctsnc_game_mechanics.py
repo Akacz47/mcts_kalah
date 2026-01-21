@@ -102,18 +102,26 @@ def is_action_legal_c4(m, n, board, extra_info, turn, action, legal_actions):
 def is_action_legal_kallah(m, n, board, extra_info, turn, action, legal_actions):
     """Functionality of function ``is_action_legal`` for the game of Connect 4.""" 
     # legal_actions[action] = True if extra_info[action] < m else False
-    if action > 5 or action < 0:
+    if action > 6 or action < 0:
         legal_actions[action] = False
-    else: 
-        if turn == 1:
-            player_row = 1
+    elif extra_info[2]==1:
+        if action==6:
+            legal_actions[action]=True
         else:
-            player_row = 0
-        stones = board[player_row, action]
-        if stones == 0:
-            legal_actions[action] = False
+            legal_actions[action]=False
+    else:
+        if action==6:
+            legal_actions[action] = False 
         else:
-            legal_actions[action] = True
+            if turn == 1:
+                player_row = 1
+            else:
+                player_row = 0
+            stones = board[player_row, action]
+            if stones == 0:
+                legal_actions[action] = False
+            else:
+                legal_actions[action] = True
 
     
 @cuda.jit(device=True)
@@ -125,13 +133,15 @@ def take_action_c4(m, n, board, extra_info, turn, action):
 
 @cuda.jit(device=True)
 def take_action_kallah(m, n, board, extra_info, turn, action):
+
     if extra_info[3]: #dla wyświetlienia
         extra_info[3] = 0
 
     if extra_info[2]: #ruch pusty nie zależnie od indexu
         extra_info[2] = 0
         extra_info[3] = 1
-        turn *= -1
+        #turn *= -1
+        return
 
     if turn == 1:
         player_row = 1
@@ -155,7 +165,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
                 stones -= 1
                 if stones == 0: #bonus ruch
                     extra_info[2] = 1
-                    turn *= -1
+                    #turn *= -1
             continue      
         elif idx < 0:
             idx = 0
@@ -167,7 +177,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
                 stones -= 1
                 if stones == 0: #bonus ruch
                     extra_info[2] = 1
-                    turn *= -1
+                    #turn *= -1
             continue
         #print(idx)
         #idx = np.clip(idx,0,Kalah.POLE-1)
@@ -189,7 +199,7 @@ def take_action_kallah(m, n, board, extra_info, turn, action):
         else:
             counter -= 1
         stones -= 1
-    turn *= -1
+    #turn *= -1
 
 @cuda.jit(device=True)
 def legal_actions_playout_c4(m, n, board, extra_info, turn, legal_actions_with_count):
@@ -229,21 +239,21 @@ def take_action_playout_c4(m, n, board, extra_info, turn, action, action_ord, le
 @cuda.jit(device=True)
 def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
     suma1 = 0
-    for i in range(len(board[:,1])):
+    for i in range(board.shape[1]):
         suma1 += board[1,i]
     suma3 = 0
-    for i in range(len(board[:,1])):
+    for i in range(board.shape[1]):
         suma3 += board[0,i]
     #if sum(board[1,:])==0:
     if suma1 == 0:
         #magazyn[0] += sum(board[0,:])
         suma2 = 0
-        for i in range(len(board[:,1])):
+        for i in range(board.shape[1]):
             suma2 += board[0,i]
         #extra_info[0] += sum(board[0,:])
         extra_info[0] += suma2
         #board[0,:] = np.zeros_like(board[0,:])
-        for i in range(len(board[:,0])):
+        for i in range(board.shape[1]):
             board[0,i] = 0
         if extra_info[0]>extra_info[1]:
             return -1
@@ -254,11 +264,11 @@ def compute_outcome_kallah(m, n, board, extra_info, turn, last_action):
     elif suma3==0:
         #magazyn[1] += sum(board[1,:])
         suma2 = 0
-        for i in range(len(board[:,1])):
+        for i in range(board.shape[1]):
             suma2 += board[1,i]
         extra_info[1] += suma2
         #board[1,:] = np.zeros_like(board[1,:])
-        for i in range(len(board[:,1])):
+        for i in range(board.shape[1]):
             board[1,i] = 0
         if extra_info[0]>extra_info[1]:
             return -1

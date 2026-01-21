@@ -560,6 +560,7 @@ class MCTSNC:
             entry["q"] = entry["n_wins"] / entry["n"] if entry["n"] > 0 else np.nan                          
             entry["ucb"] = entry["q"] + self.ucb_c * np.sqrt(np.log(entry["n_root"]) / entry["n"]) if entry["n"] > 0 else np.inf
             actions_info[a] = entry
+            print(entry)
             if a == self.best_action:
                 best_entry = {"index": int(a), **entry}
         actions_info["best"] = best_entry

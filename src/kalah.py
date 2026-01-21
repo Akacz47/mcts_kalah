@@ -273,7 +273,7 @@ class Kalah(State):
 
     @staticmethod
     def get_extra_info_memory():      
-        return 5
+        return 6
 
     @staticmethod
     def get_max_actions():
